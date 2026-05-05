@@ -1,0 +1,33 @@
+name: Library Management CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  library-management-server-push:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    steps:
+      - name: Checkout code
+        user: actions/checkout@v4
+
+      - name: setup docker image
+        user: docker/setup-buildx-action@v4
+
+      - name: login to github
+        user: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
+
+      - name: build docker image
+        run: docker build -t ${{ env.DOCKER_USERNAME }}/anukul-api:1.0.0 .
+
+      - name: push docker image
+        run: docker push ${{ env.DOCKER_USERNAME }}/anukul-api:1.0.0
